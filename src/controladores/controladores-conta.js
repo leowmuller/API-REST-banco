@@ -1,5 +1,12 @@
 const express = require(`express`);
 const { contas } = require(`../bancodedados`);
+const {
+    verificarCPF,
+    verificarEmail,
+    verificarCamposUsuarioPreenchidos,
+    verificarAntesDeAtualizarConta,
+    verificarAntesDeExcluirConta
+} = require("../funcoes-uteis/verificadores");
 
 
 //Rota 1
@@ -10,6 +17,22 @@ const listarContas = (req, res) => {
 //Rota 2
 const criarConta = (req, res) => {
     const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
+
+    const verifCampos = verificarCamposUsuarioPreenchidos(req.body);
+    if (verifCampos) {
+        return res.status(400).json(verifCampos);
+    };
+
+    const verifCPF = verificarCPF(cpf);
+    if (verifCPF) {
+        return res.status(400).json(verifCPF);
+    };
+
+    const verifEmail = verificarEmail(email);
+    if (verifEmail) {
+        return res.status(400).json(verifEmail);
+
+    };
 
     const conta = {
         numero: (contas.length + 1).toString(),
@@ -27,6 +50,22 @@ const criarConta = (req, res) => {
 const atualizarUsuario = (req, res) => {
     const { nome, cpf, data_nascimento, telefone, email, senha } = req.body;
     const { numeroConta } = req.params;
+
+    if (Object.keys(req.body).length === 0) {
+        return res.status(400).json({
+            mensagem: `nenhuma informação fornecida para atualizar`
+        });
+    };
+
+    const verifCPF = verificarCPF(cpf);
+    if (verifCPF) {
+        return res.status(400).json(verifCPF);
+    };
+
+    const verifAtualizacao = verificarAntesDeAtualizarConta(cpf, email, numeroConta);
+    if (verifAtualizacao) {
+        return res.status(400).json(verifAtualizacao);
+    };
 
     const contaEncontrada = contas.find((conta) => {
         return conta.numero === numeroConta;
@@ -92,6 +131,11 @@ const atualizarUsuario = (req, res) => {
 //Rota 4
 const deletarContaBancaria = (req, res) => {
     const { numeroConta } = req.params;
+
+    const verifExclusao = verificarAntesDeExcluirConta(numeroConta);
+    if (verifExclusao) {
+        return res.status(400).json(verifExclusao);
+    };
 
     const contaEncontrada = contas.find((conta) => {
         return conta.numero === numeroConta;

@@ -7,10 +7,21 @@ const {
     transferencias
 } = require(`../bancodedados`);
 
+const {
+    verificarAntesDeDepositar,
+    verificarAntesDeSacar,
+    verificarCamposBodyTransferencias,
+    verificarAntesDeTransferir
+} = require("../funcoes-uteis/verificadores");
 
 //Rota 5
 const depositar = (req, res) => {
-    const { numeroConta, valorDeposito } = req.body
+    const { numeroConta, valorDeposito } = req.body;
+
+    const verifDeposito = verificarAntesDeDepositar(numeroConta, valorDeposito);
+    if (verifDeposito) {
+        return res.status(400).json(verifDeposito);
+    };
 
     const contaEncontrada = contas.find((conta) => {
         return conta.numero === numeroConta;
@@ -51,6 +62,11 @@ const depositar = (req, res) => {
 //Rota 6
 const sacar = (req, res) => {
     const { numeroConta, valorSaque } = req.body;
+
+    const verifSaque = verificarAntesDeSacar(numeroConta, valorSaque);
+    if (verifSaque) {
+        return res.status(400).json(verifSaque);
+    };
 
     const contaEncontrada = contas.find((conta) => {
         return conta.numero === numeroConta;
@@ -94,6 +110,16 @@ const transferir = (req, res) => {
         numeroContaDestino,
         valorTransferencia,
     } = req.body;
+
+    const verifCampos = verificarCamposBodyTransferencias(req.body);
+    if (verifCampos) {
+        return res.status(400).json(verifCampos);
+    };
+
+    const verifTransferencia = verificarAntesDeTransferir(req.body);
+    if(verifTransferencia) {
+        return res.status(400).json(verifTransferencia);
+    };
 
     const contaOrigemEncontrada = contas.find((conta) => {
         return conta.numero === numeroContaOrigem;

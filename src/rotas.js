@@ -3,7 +3,8 @@ const { Router } = require(`express`);
 const rotas = Router();
 
 //Controladores de operações com conta bancária
-const { listarContas,
+const { 
+    listarContas,
     criarConta,
     atualizarUsuario,
     deletarContaBancaria
@@ -19,84 +20,47 @@ const {
 } = require(`./controladores/controladores-transacoes`);
 
 //Intermediários
-const { verificarSenhaBanco,
+const { 
+    verificarSenhaBanco,
     verificarSenhaUsuarioQueryParams,
-    verificarAntesDeAtualizarConta,
-    verificarAntesDeExcluirConta,
-    verificarAntesDeDepositar,
     verificarSenhaUsuarioNoBody,
-    verificarAntesDeSacar,
-    verificarAntesDeTransferir
 } = require(`./controladores/intermediarios`);
-
-
-//Verificadores de campos
-const { verificarCPF,
-    verificarEmail,
-    verificarCamposUsuarioPreenchidos,
-    verificarCamposBodyTransferencias
-} = require(`./funcoes-uteis/verif-campos`);
 
 
 //Rota 1
 //Listar contas bancárias
-rotas.get(`/contas`, 
-verificarSenhaBanco, 
-listarContas);
+rotas.get(`/contas`, verificarSenhaBanco, listarContas);
 
 //Rota 2
 //Criar conta bancária
-rotas.post(`/contas`, 
-verificarSenhaBanco, 
-verificarCamposUsuarioPreenchidos, 
-verificarCPF, 
-verificarEmail, 
-criarConta);
+rotas.post(`/contas`, verificarSenhaBanco, criarConta);
 
 //Rota 3
 //Atualizar usuário da conta bancária
-rotas.put(`/contas/:numeroConta/usuario`, 
-verificarSenhaUsuarioQueryParams, 
-verificarAntesDeAtualizarConta, 
-atualizarUsuario);
+rotas.put(`/contas/:numeroConta/usuario`, verificarSenhaUsuarioQueryParams, atualizarUsuario);
 
 //Rota 4
 //Deletar conta bancária
-rotas.delete(`/contas/:numeroConta`, 
-verificarSenhaUsuarioQueryParams, 
-verificarAntesDeExcluirConta, 
-deletarContaBancaria);
+rotas.delete(`/contas/:numeroConta`, verificarSenhaUsuarioQueryParams, deletarContaBancaria);
 
 //Rota 5
 //Depositar
-rotas.post(`/transacoes/depositar`, 
-verificarAntesDeDepositar, 
-depositar);
+rotas.post(`/transacoes/depositar`, depositar);
 
 //Rota 6
 //Sacar
-rotas.post(`/transacoes/sacar`, 
-verificarAntesDeSacar, 
-verificarSenhaUsuarioNoBody, 
-sacar);
+rotas.post(`/transacoes/sacar`, verificarSenhaUsuarioNoBody,sacar);
 
 //Rota 7
 //Transferir
-rotas.post(`/transacoes/transferir`, 
-verificarCamposBodyTransferencias, 
-verificarAntesDeTransferir, 
-transferir);
+rotas.post(`/transacoes/transferir`, transferir);
 
 //Rota 8
 //Consultar Saldo
-rotas.get(`/contas/saldo`, 
-verificarSenhaUsuarioQueryParams, 
-consultarSaldo);
+rotas.get(`/contas/saldo`, verificarSenhaUsuarioQueryParams, consultarSaldo);
 
 //Rota 9
 //Consultar extrato
-rotas.get(`/contas/extrato`, 
-verificarSenhaUsuarioQueryParams, 
-consultarExtrato);
+rotas.get(`/contas/extrato`, verificarSenhaUsuarioQueryParams, consultarExtrato);
 
 module.exports = rotas;
